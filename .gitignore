@@ -2,3 +2,8 @@
 .launches
 .settings
 Debug
+testbench
+targetConfigs
+.ccsproject
+.project
+lib
