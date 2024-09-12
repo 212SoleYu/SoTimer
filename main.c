@@ -22,7 +22,7 @@ int main(void)
     /* General Initialization */
 	power_on_init();
 
-	clock_sys_init(current_working_freq, CS_CLOCK_DIVIDER_1, CS_CLOCK_DIVIDER_2);       // 参数2和3默认为1分频和2分频，无需改变，主时钟MCLK频率在每次重启都要根据FRAM中的保留频率进行。
+	clock_sys_init(current_working_freq, CS_CLOCK_DIVIDER_1, CS_CLOCK_DIVIDER_1);       // 参数2和3默认为1分频和1分频，无需改变，主时钟MCLK频率在每次重启都要根据FRAM中的保留频率进行。
     EUSCI_init(current_working_freq,1,1,1);                                             // 参数2和3默认为1，标识EUSCIA0和A1都工作，参数4默认为1，表示工作状态为115200波特率。
 	timer_init();                                                                       // 高速时钟选择SMCLK，低速时钟选择ACLK
 

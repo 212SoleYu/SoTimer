@@ -1,7 +1,7 @@
 #include<Modules/redirection.h>
 
 
-// 选择printf重定向到那个模块，0代表与EZ-fet通信，1代表与收发器通信，前提是两个UART模块都初始化完成。
+// 选择printf重定向到那个模块，0代表与EZ-fet通信，1代表与收发器通信，前提是两个UART模块都初始化完成。方便调试输出而已，与主程序无关。
 #define MODULE_ENABLE    0
 
 #if (MODULE_ENABLE == 0)

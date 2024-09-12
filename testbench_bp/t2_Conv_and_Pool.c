@@ -1,11 +1,6 @@
 /*
- * File name: testbench_3_Cov.c
- * Description: 用于测试的第三个例程，该例程的初步构想为：
- *              1. 预先与另一台主机建立通讯，各自完成初始化任务
- *              2. 本机向从机发送信号，从机发送若干字节的数据，填充本机预留的矩阵，此处可选使用DMA来进行传输
- *              3. 本机接受后进行一次卷积，获得一个小的矩阵内容
- *              4. 进行一次池化，再获得一个更小一点的矩阵
- *              5. 将小的池化后的数组的内容返回给从机
+ * File name: t2_Conv_and_Pool.c
+ * Description: 用于测试的第三个例程
  */
 #include<testbench_bp/header.h>
 
@@ -34,7 +29,7 @@ uint8_t MaxPool(uint8_t x, uint8_t y)
 }
 
 
-void testbench_3()
+void testbench_2()
 {
     set_breakpoint;
     __no_operation();

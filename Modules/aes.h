@@ -18,10 +18,6 @@ extern const  uint8_t aes_key[16];
 
 
 
-/*
- * Function name: aes_init()
- * Description:  to clear the interrupt, just init the aes module but not start it.
- */
 void aes_init();
 
 

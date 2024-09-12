@@ -26,14 +26,14 @@ uint32_t time_off = 0;                                      // Ô¤²âµÄ¶ÏµçÊ±¼ä
 uint32_t var;                                           // µçÑ¹²âÁ¿Öµ
 
 // regression data for 1000uF
-//static const float w1 = -0.50083057;
-//static const float w2 = -0.54463161;
-//static const float bias = 10.094598802589179;
+static const float w1 = -0.74425031;
+static const float w2 = -0.25251241;
+static const float bias = 15.018864192439532;
 
 // 470uF
-static const float w1 = -0.52611847;
-static const float w2 = -0.55975162;
-static const float bias = 9.053817974072206;
+//static const float w1 = -0.52611847;
+//static const float w2 = -0.55975162;
+//static const float bias = 9.053817974072206;
 
 
 
@@ -67,6 +67,8 @@ uint32_t last_time_record = 0;                          // ÓÃÓÚ¼ÆËãÊ±¼ä²îÖµ
 //#pragma PERSISTENT(energy_consumption)
 uint32_t energy_consumption = 0;                        // ¿ª»úÆÚ¼äÖ±µ½µÚÒ»´Î½øÈëbreakpointÕâ¶Î³õÊ¼»¯ÏûºÄµÄÄÜÁ¿£¨ÀÛ¼Ó¼ÆËãµÃµ½£©£¬³õÊ¼ÖµÉèÎª1
 
+uint32_t energy_raw = 0;                                // pt-method ¼ÆËã³öµÄÄÜºÄÖµ
+
 
 
 /**********************************************************************************************************************************/
@@ -74,38 +76,56 @@ uint32_t energy_consumption = 0;                        // ¿ª»úÆÚ¼äÖ±µ½µÚÒ»´Î½øÈ
 // power table, 0-2´ú±í¸÷¸ö´óµÄ½×¶ÎµÄµäÐÍ¹¦ÂÊ£¬3´ú±íÈÎÎñÖ®¼äÇÐ»»µÄ¼äÏ¶µÄµäÐÍ¹¦ÂÊ¡£
 const uint32_t cycle_cost[FREQUENCY_NUMBER][TASK_NUMBER][PHASE_NUMBER] = {
   {
-   {378,378,378,378},
-   {367,382,366,366},
-   {363,366,360,360}
+   {400,397,394,394},
+   {390,375,364,364},
+   {378,375,372,372},
+   {0,0,0,0},
+   {340,348,346,346},
+   {377,364,360,360},
+   {329,386,372,329}
   },//1MHz
   {
-    {676,703,675,675},
-    {626,636,612,612},
-    {636,630,608,608}
+   {727,711,697,697},
+   {650,642,618,618},
+   {640,624,610,610},
+   {0,0,0,0},
+   {523,541,533,533},
+   {603,598,582,582},
+   {489,618,545,489}
   },//3.33MHz
   {
-   {742,766,700,700},
-   {679,686,668,668},
-   {687,669,657,657}
+   {791,776,764,764},
+   {700,690,670,670},
+   {687,669,657,657},
+   {0,0,0,0},
+   {554,582,590,580},
+   {642,633,633,633},
+   {513,672,553,513}
   },//4MHz
   {
-    {1090,1136,1000,878},
-    {991,1005,976,976},
-    {1008,1008,912,912}
+   {1182,1148,1127,1127},
+   {1030,1016,994,994},
+    {994,963,912,912},
+    {0,0,0,0},
+    {795,812,794,794},
+    {939,928,906,906},
+    {686,838,722,686}
   },//6.67MHz
   {
-    {1242,1272,1200, 945},
+//    {1242,1272,1200, 945},
+   {1311,1280,1251,1251},
     {1089,1101,1084,1084},
-    {1118,1118,1010,1010}
-  },//8MHz
-  {
-    {1020,1020,1020,1020},
-    {1020,1020,1020,1020},
-    {1020,1020,1020,1020}
-  }//16MHz
+    {1000,1095,1053,1000},
+    {0,0,0,0},
+    {835,894,853,853},
+    {1036,1024,984,984},
+    {756,942,813,756}
+  }//8MHz
+
 };
 
-
+// 4MHz ÏÂ¸÷ÈÎÎñµÄµäÐÍ¹¦ÂÊ
+const uint32_t P_table[TASK_NUMBER] = {2552, 2289, 2200, 0, 1856, 2110, 1807};
 
 // ºËÐÄµÄÖÐ¶Ïº¯Êý
 #pragma vector = TIMER0_A0_VECTOR
@@ -129,7 +149,7 @@ __interrupt void Agent_ISR(void)
     volt1 = ADC12MEM0;
 
     var = (uint16_t)((((uint32_t)(volt1))*225)>>8);              // µçÑ¹×ª»»ÎªÒÔmVÎªµ¥Î»µÄ¹ÀÖµ¡£Èý·ÖÑ¹ÏÂ²Î¿¼µçÑ¹Îª1.2V¡£
-
+//    var = 3300;
 
     TA0CCR0 += TIMER_ROUTINE;
 
@@ -138,16 +158,17 @@ __interrupt void Agent_ISR(void)
     {
         if (energy_consumption == 0)
         {
+            system_in_running = 0;
             EUSCI_A_UART_transmitData(EUSCI_A1_BASE, 0x43);
             return ;
         }
-        // Ê±¼äÒÔmsÎªµ¥Î»
+        // Ê±¼ä
         time_on = ((uint32_t)(time_overflow_flag) << 16) + (uint32_t)TA4R;
 
-//        time_off = regression(energy_consumption,time_on);
-        time_off = energy_consumption;
+//        time_off = regression(energy_consumption,time_on);            // ÓÃÓÚÊµ¼Ê²¿ÊðºÍÑéÖ¤
+        time_off = energy_consumption;                                  // ÓÃÓÚ²âÁ¿
 
-//        time_on = energy_consumption;
+//        time_on = energy_consumption;                                 // ÓÃÓÚÊµ¼Ê²¿ÊðºÍÑéÖ¤
         char* ptr = (char*)(&time_off);
         for(i = 0;i<4;i++)
             shut_buffer[i+1] = *(ptr+i);
@@ -244,7 +265,7 @@ __interrupt void ACLK_timer_handle()
             }
             if(phase_index>=4) phase_index = 0;
             energy_consumption += (((cycle_cost[current_working_freq][task_number][phase_index]*var)>>10) * period) >> 10;
-
+//            energy_raw += (P_table[task_number] * period) >> 10;
 //            phase_index++;
 
             break;
@@ -263,10 +284,11 @@ __interrupt void ACLK_timer_handle()
 }
 
 inline uint32_t regression(uint32_t E,uint32_t T)
+
 {
-    if (E>4000 || T>4000)
+    if (E>9999 || T>9999)
     {
-        return 10000;
+        return 9999;
     }
 //    float a = (float)E;float b = (float)T;
     float a = log_result[E];
@@ -278,7 +300,7 @@ inline uint32_t regression(uint32_t E,uint32_t T)
     if (c < 0.0  || c > log_result[DATA_RANGE-1])
     {
         // ·¶Î§³¬ÁË£¬ÐèÒªµ¥¶À´¦Àí
-        return 10000;
+        return 9999;
     }
 
     unsigned int left = 0;

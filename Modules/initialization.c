@@ -1,6 +1,6 @@
 /*
  * File name: initialization.c
- * Description: 完成对于初始化函数的所有定义，初始化时钟、高速和低俗定时器，DMA以及两个按钮的中断。
+ * Description: 完成对于初始化函数的所有定义，初始化时钟、高速和低速定时器，DMA以及两个按钮的中断。
  */
 #include <Modules/initialization.h>
 
@@ -81,10 +81,10 @@ void timer_init()
     // 低速的定时器TimerA4，一般与主定时器频率不同，目前采用低速时钟来对程序进行检测，可以进行分频，设定为捕获模式来记录不同程序段的时间，在程序中通过手动控制中断源来触发该中断处理函数。
     // 在初始化函数中处理好P5.1和P5.7的端口输入输出，并且将断点函数直接生成为汇编语句作为断点直接插入函数中，在并且在中断服务函数中恢复信号以及处理COV溢出标志等，从而减少函数调用的压栈等操作。
 
-    // 初始化主计时器，声明为连续模式，使用ACLK低速时钟，计时器的计数间隔可以设置为1ms
+    // 初始化主计时器，声明为连续模式，使用ACLK低速时钟，计时器的计数间隔可以设置为0.1ms
     Timer_A_initContinuousModeParam counter_low ={0};
     counter_low.clockSource = TIMER_A_CLOCKSOURCE_ACLK;
-    counter_low.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_5;
+    counter_low.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1;
     counter_low.startTimer = false;
     counter_low.timerClear = TIMER_A_SKIP_CLEAR;
     counter_low.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE;
@@ -133,8 +133,6 @@ void timer_init()
       P5DIR &= ~BIT7;
       P5REN |= BIT7;
 
-//      // P5.7作为一个输入接口，承接另一个GPIO的输出，P5.1输出
-//      P5DIR |= BIT1;
 
 
 }

@@ -21,20 +21,4 @@ extern int CLK_SYS_params[6][2];
 // UART params
 extern EUSCI_A_UART_initParam UARTlist[6][2];
 
-// Timer params
-
-
-
-
-
-// ADC params
-
-
-
-
-
-
-
-
-
 #endif

@@ -169,10 +169,11 @@ void EUSCI_init(int UART_mode, int A0_flag, int A1_flag, int Baud_rate)
     GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P2, GPIO_PIN5, GPIO_SECONDARY_MODULE_FUNCTION);
     GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P2, GPIO_PIN6, GPIO_SECONDARY_MODULE_FUNCTION);
 
-    // init for A0
+    // changing configuration of UART Buad rate
 //    EUSCI_A_UART_initParam param = {0};
 //    param = UARTlist[UART_mode][Baud_rate];
 
+    // constant configuration
     EUSCI_A_UART_initParam param = {
         EUSCI_A_UART_CLOCKSOURCE_SMCLK,
         2,                                            // UCBRx

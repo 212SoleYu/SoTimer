@@ -1,5 +1,5 @@
 /*
- * File name: handwritten_cpu.c
+ * File name:  t0_Sort.c
  * Date: 2024-03-12
  * Description: 用于运行的例程1.
  */
@@ -8,20 +8,24 @@
 
 
 // 划分任务时要注意BUF_LENGTH长度： 256
-void testbench_1()
+void testbench_0()
 {
 
     set_breakpoint;
     __no_operation();
     phase_update;
     // phase 1
+
     unsigned int i,j;
     uint16_t volt = 0x7f;
     for(i =0;i<BUF_LENGTH;i++)
     {
-//        ADC12CTL0 |= ADC12SC;                        // Start conversion-software trigger
-//        while (!(ADC12IFGR0 & BIT0)) {/* WAIT */}
-//        volt = ADC12MEM0;
+//        if(i&0xF0 == 0)
+//        {
+//            ADC12CTL0 |= ADC12SC;                        // Start conversion-software trigger
+//            while (!(ADC12IFGR0 & BIT0)) {/* WAIT */}
+//            volt = ADC12MEM0;
+//        }
         Volt[i] = volt;
 
         // 256长度采样的一半中断一次
@@ -30,6 +34,8 @@ void testbench_1()
     }
 
     set_breakpoint;                             // 剩余的一半结束后打个断点
+
+
 
     __no_operation();
     // phase 2
@@ -43,6 +49,8 @@ void testbench_1()
     }
 
     // 剩余部分打个断点
+
+
     set_breakpoint;
     __no_operation();
     phase_update;

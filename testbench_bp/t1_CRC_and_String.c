@@ -1,5 +1,5 @@
 /*
- * File name: handwritten_mem.c
+ * File name: t1_CRC_and_String.c
  * Date: 2024-03-13
  * Description: 手写的用于测试的分段程序，其功能如下：
  *              1. 使用CPU对内存中的CRC模块进行计算，得到一个软件结果SW_RESULT
@@ -11,7 +11,7 @@
 #include<testbench_bp/header.h>
 
 // CRC_LENGTH 512
-void testbench_2()
+void testbench_1()
 {
     set_breakpoint;
     __no_operation();
@@ -60,8 +60,6 @@ void testbench_2()
     phase_update;
     // phase 3 CRC运算完毕后使用AES进行加密
 
-//    AES256_clearInterrupt()
-//    AES256_enableInterrupt(AES_BASE);
     uint8_t offset = 0;
     for(offset = 0;offset<32;offset++)
     {
@@ -71,7 +69,6 @@ void testbench_2()
         if(offset == 16)
             set_breakpoint;
     }
-//    AES256_disableInterrupt(AES_BASE);
     set_breakpoint;
     __no_operation();
     phase_update;
