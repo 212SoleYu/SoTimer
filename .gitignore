@@ -1,9 +1,8 @@
 .energytrace
 .launches
 .settings
-Debug
-testbench
-targetConfigs
+Debug/
+targetConfigs/
 .ccsproject
 .project
-lib
+lib/
